@@ -186,36 +186,37 @@ body {
 body.touch .touchpad { display: block; position: fixed; inset: 0; }
 body.touch .no-touch { display: none; }
 body.touch .touch-only { display: block; }
-.tzone { position: absolute; bottom: 0; top: 34%; touch-action: none; }
+.tzone { position: absolute; bottom: 0; top: 40%; touch-action: none; }
 #tzoneL { left: 0; width: 40%; }
 #tzoneR { right: 0; width: 40%; }
 .tbase {
-  position: absolute; width: 124px; height: 124px; margin: -62px 0 0 -62px; border-radius: 50%;
+  position: absolute; width: 96px; height: 96px; margin: -48px 0 0 -48px; border-radius: 50%;
   border: 1.5px solid rgba(232, 238, 245, 0.35); background: rgba(14, 22, 32, 0.35);
   transition: opacity 0.15s; opacity: 0.55; pointer-events: none;
 }
 .tbase.on { opacity: 1; transition: none; }
 .tknob {
-  position: absolute; left: 50%; top: 50%; width: 54px; height: 54px; margin: -27px 0 0 -27px; border-radius: 50%;
+  position: absolute; left: 50%; top: 50%; width: 42px; height: 42px; margin: -21px 0 0 -21px; border-radius: 50%;
   background: var(--amber); box-shadow: 0 0 0 4px rgba(242, 177, 52, 0.25);
 }
 .tlabel {
-  position: absolute; left: 0; right: 0; bottom: calc(8px + env(safe-area-inset-bottom, 0px));
-  text-align: center; font: 600 11px/1 var(--font-display); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);
-  pointer-events: none;
+  position: absolute; left: 50%; bottom: calc(100% + 6px); transform: translateX(-50%); white-space: nowrap;
+  font: 600 10px/1 var(--font-display); letter-spacing: 0.12em; text-transform: uppercase; color: var(--fg);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); pointer-events: none;
 }
+/* pulsanti: piccole pillole in fila in basso al centro, tra i due joystick */
 body.touch .tbtns {
-  display: flex; flex-direction: column; gap: 8px; position: fixed; left: 50%; transform: translateX(-50%);
-  top: calc(118px + env(safe-area-inset-top, 0px)); width: min(132px, 18vw);
+  display: flex; flex-direction: row; gap: 6px; position: fixed; left: 50%; transform: translateX(-50%);
+  bottom: calc(10px + env(safe-area-inset-bottom, 0px));
 }
 body.touch .tgimbal:not([hidden]) {
-  display: flex; gap: 8px; position: fixed; left: 50%; transform: translateX(-50%);
-  bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  display: flex; gap: 6px; position: fixed; left: 50%; transform: translateX(-50%);
+  bottom: calc(50px + env(safe-area-inset-bottom, 0px));
 }
 .tbtn {
-  font: 600 13px/1 var(--font-display); letter-spacing: 0.08em; text-transform: uppercase;
-  background: var(--glass); color: var(--fg); border: 1px solid var(--line); border-radius: 10px;
-  padding: 11px 8px; touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+  font: 600 11px/1 var(--font-display); letter-spacing: 0.08em; text-transform: uppercase;
+  background: var(--glass); color: var(--fg); border: 1px solid var(--line); border-radius: 999px;
+  min-width: 64px; padding: 8px 12px; touch-action: manipulation; -webkit-tap-highlight-color: transparent;
 }
 .tbtn:active { background: rgba(242, 177, 52, 0.25); }
 .tbtn-main { background: var(--amber); color: #1b1305; border-color: transparent; }
@@ -240,7 +241,7 @@ body.touch .toast { font-size: 13px; padding: 6px 10px; }
     font: 600 16px/1.3 var(--font-display); letter-spacing: 0.06em; text-transform: uppercase;
     padding: 14px; border-radius: 10px; background: rgba(14, 22, 32, 0.85); color: var(--amber);
   }
-  body.touch .tbtns { top: auto; bottom: calc(50% + 50px); flex-direction: row; width: auto; }
+  body.touch .tbtns { bottom: calc(50% + 50px); }
 }
 @media (max-width: 760px) {
   .sticks { display: none; }
@@ -257,8 +258,8 @@ body.touch .toast { font-size: 13px; padding: 6px 10px; }
 
 <canvas id="scene" aria-label="Simulatore di volo 3D"></canvas>
 <div class="touchpad" id="touchpad" aria-hidden="true">
-  <div class="tzone" id="tzoneL"><div class="tbase" id="tbaseL"><div class="tknob" id="tknobL"></div></div><span class="tlabel" id="tlabelL">Gas · rotazione</span></div>
-  <div class="tzone" id="tzoneR"><div class="tbase" id="tbaseR"><div class="tknob" id="tknobR"></div></div><span class="tlabel" id="tlabelR">Avanti · laterale</span></div>
+  <div class="tzone" id="tzoneL"><div class="tbase" id="tbaseL"><span class="tlabel" id="tlabelL">Gas · rotazione</span><div class="tknob" id="tknobL"></div></div></div>
+  <div class="tzone" id="tzoneR"><div class="tbase" id="tbaseR"><span class="tlabel" id="tlabelR">Avanti · laterale</span><div class="tknob" id="tknobR"></div></div></div>
 </div>
 <div class="tbtns" id="tbtns">
   <button type="button" class="tbtn tbtn-main" id="tbTake">Decolla</button>
@@ -1359,15 +1360,17 @@ window.addEventListener("error", function (e) {
   }
 
   // ---------- Comandi touch (solo iPhone, iPad, Android) ----------
-  const TOUCH_R = 56; // corsa massima del pollice, in px
+  const TOUCH_R = 44; // corsa massima del pollice, in px
   function setupStick(side) {
     const zone = $("tzone" + side), base = $("tbase" + side), knob = $("tknob" + side);
     const kx = side === "L" ? "lx" : "rx", ky = side === "L" ? "ly" : "ry";
     let id = null, cx = 0, cy = 0;
     function rest() {
       const r = zone.getBoundingClientRect();
-      base.style.left = (r.width * (side === "L" ? 0.42 : 0.58)) + "px";
-      base.style.top = (r.height * 0.55) + "px";
+      // a riposo: in basso, vicino ai bordi laterali (lontano dal centro dove vola il drone)
+      const edge = 96;
+      base.style.left = (side === "L" ? edge : r.width - edge) + "px";
+      base.style.top = Math.max(60, r.height - 72) + "px";
       knob.style.transform = "";
       base.classList.remove("on");
     }
@@ -1385,7 +1388,7 @@ window.addEventListener("error", function (e) {
       try { zone.setPointerCapture(id); } catch (err) { /* ignora */ }
       // la base del joystick compare sotto il pollice, ovunque tocchi nella zona
       const r = zone.getBoundingClientRect();
-      const m = 66;
+      const m = 50;
       cx = clamp(e.clientX, r.left + m, r.right - m);
       cy = clamp(e.clientY, r.top + m, r.bottom - m);
       base.style.left = (cx - r.left) + "px"; base.style.top = (cy - r.top) + "px";
