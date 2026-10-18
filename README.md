@@ -19,6 +19,7 @@ Serve una connessione internet al primo avvio, per scaricare il motore 3D (Three
 - Vento con raffiche, batteria simulata, collisioni
 - Tre viste: dietro al drone, camera del drone, dal pilota
 - Percorso di allenamento: cerchio di coni, slalom di pali, porta
+- Comandi touch su iPhone, iPad e Android
 
 ## Comandi
 
@@ -34,6 +35,10 @@ Serve una connessione internet al primo avvio, per scaricare il motore 3D (Three
 | Gimbal | LT · RT | Q · E |
 | Riparti | Start | R |
 | Impostazioni | View / Select | P · Esc |
+
+## Telefono e tablet
+
+Su iPhone, iPad e Android compaiono i comandi touch: due joystick virtuali (Mode 2) che appaiono dove appoggi i pollici, e pulsanti per decollo/atterraggio, ritorno a casa, stop e cambio vista. Tieni il telefono in orizzontale. Su iPhone, per lo schermo intero, usa Condividi → Aggiungi alla schermata Home. Funziona anche un controller Bluetooth.
 
 ## Steam Deck
 

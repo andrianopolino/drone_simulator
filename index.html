@@ -1,5 +1,9 @@
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Campo Volo">
 <title>Campo Volo Mini</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -23,6 +27,7 @@
 }
 [hidden] { display: none !important; } /* serve anche aprendo il file direttamente */
 html, body { height: 100%; margin: 0; }
+body.touch { touch-action: none; -webkit-touch-callout: none; }
 body {
   background: var(--ink);
   color: var(--fg);
@@ -176,6 +181,67 @@ body {
 .field select:focus-visible, .field input:focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; }
 .tip { font-size: 13px; color: #c9d4df; border-left: 3px solid var(--amber); padding: 8px 12px; background: rgba(242, 177, 52, 0.06); line-height: 1.5; }
 
+/* comandi touch: visibili solo con la classe .touch (iPhone, iPad, Android) */
+.touchpad, .tbtns, .tgimbal, .rotate-hint, .touch-only { display: none; }
+body.touch .touchpad { display: block; position: fixed; inset: 0; }
+body.touch .no-touch { display: none; }
+body.touch .touch-only { display: block; }
+.tzone { position: absolute; bottom: 0; top: 34%; touch-action: none; }
+#tzoneL { left: 0; width: 40%; }
+#tzoneR { right: 0; width: 40%; }
+.tbase {
+  position: absolute; width: 124px; height: 124px; margin: -62px 0 0 -62px; border-radius: 50%;
+  border: 1.5px solid rgba(232, 238, 245, 0.35); background: rgba(14, 22, 32, 0.35);
+  transition: opacity 0.15s; opacity: 0.55; pointer-events: none;
+}
+.tbase.on { opacity: 1; transition: none; }
+.tknob {
+  position: absolute; left: 50%; top: 50%; width: 54px; height: 54px; margin: -27px 0 0 -27px; border-radius: 50%;
+  background: var(--amber); box-shadow: 0 0 0 4px rgba(242, 177, 52, 0.25);
+}
+.tlabel {
+  position: absolute; left: 0; right: 0; bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+  text-align: center; font: 600 11px/1 var(--font-display); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);
+  pointer-events: none;
+}
+body.touch .tbtns {
+  display: flex; flex-direction: column; gap: 8px; position: fixed; left: 50%; transform: translateX(-50%);
+  top: calc(118px + env(safe-area-inset-top, 0px)); width: min(132px, 18vw);
+}
+body.touch .tgimbal:not([hidden]) {
+  display: flex; gap: 8px; position: fixed; left: 50%; transform: translateX(-50%);
+  bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+}
+.tbtn {
+  font: 600 13px/1 var(--font-display); letter-spacing: 0.08em; text-transform: uppercase;
+  background: var(--glass); color: var(--fg); border: 1px solid var(--line); border-radius: 10px;
+  padding: 11px 8px; touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+}
+.tbtn:active { background: rgba(242, 177, 52, 0.25); }
+.tbtn-main { background: var(--amber); color: #1b1305; border-color: transparent; }
+.tbtn-main:active { background: #d99a22; }
+body.touch .bottom {
+  top: calc(52px + env(safe-area-inset-top, 0px)); bottom: auto; align-items: flex-start; padding-top: 4px; padding-bottom: 0;
+}
+body.touch .sticks { display: none; }
+body.touch .telemetry { grid-template-columns: repeat(4, auto); gap: 2px 12px; padding: 6px 10px; }
+body.touch .tel { min-width: 48px; }
+body.touch .tel b { font-size: 15px; }
+body.touch .tel .label { font-size: 9px; }
+body.touch #radar { width: 84px; height: 84px; }
+body.touch .radar-wrap { padding: 4px; }
+body.touch .radar-wrap .label { display: none; }
+body.touch .viewtag { bottom: auto; top: calc(100px + env(safe-area-inset-top, 0px)); }
+body.touch .toasts { top: calc(150px + env(safe-area-inset-top, 0px)); width: min(360px, 44vw); }
+body.touch .toast { font-size: 13px; padding: 6px 10px; }
+@media (orientation: portrait) {
+  body.touch .rotate-hint {
+    display: block; position: fixed; left: 16px; right: 16px; top: 45%; text-align: center; pointer-events: none;
+    font: 600 16px/1.3 var(--font-display); letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 14px; border-radius: 10px; background: rgba(14, 22, 32, 0.85); color: var(--amber);
+  }
+  body.touch .tbtns { top: auto; bottom: calc(50% + 50px); flex-direction: row; width: auto; }
+}
 @media (max-width: 760px) {
   .sticks { display: none; }
   .tel b { font-size: 18px; }
@@ -190,6 +256,22 @@ body {
 </style>
 
 <canvas id="scene" aria-label="Simulatore di volo 3D"></canvas>
+<div class="touchpad" id="touchpad" aria-hidden="true">
+  <div class="tzone" id="tzoneL"><div class="tbase" id="tbaseL"><div class="tknob" id="tknobL"></div></div><span class="tlabel" id="tlabelL">Gas · rotazione</span></div>
+  <div class="tzone" id="tzoneR"><div class="tbase" id="tbaseR"><div class="tknob" id="tknobR"></div></div><span class="tlabel" id="tlabelR">Avanti · laterale</span></div>
+</div>
+<div class="tbtns" id="tbtns">
+  <button type="button" class="tbtn tbtn-main" id="tbTake">Decolla</button>
+  <button type="button" class="tbtn" id="tbHome">Casa</button>
+  <button type="button" class="tbtn" id="tbStop">Stop</button>
+  <button type="button" class="tbtn" id="tbView">Vista</button>
+  <button type="button" class="tbtn" id="tbReset">Riparti</button>
+</div>
+<div class="tgimbal" id="tgimbal" hidden>
+  <button type="button" class="tbtn" id="tbGimUp" aria-label="Gimbal su">Gimbal ▲</button>
+  <button type="button" class="tbtn" id="tbGimDown" aria-label="Gimbal giù">Gimbal ▼</button>
+</div>
+<div class="rotate-hint" aria-live="polite">Gira il telefono in orizzontale per pilotare</div>
 <div class="hud" id="hud">
   <header class="topbar">
     <div class="tb-group">
@@ -261,7 +343,19 @@ body {
           <tr><td>Start · View</td><td>Riparti · Impostazioni</td></tr>
         </table>
       </div>
-      <div>
+      <div class="touch-only">
+        <h2>Touch</h2>
+        <table class="keys">
+          <tr><td>Pollice sinistro</td><td>Su/giù: sali e scendi · Lati: ruota</td></tr>
+          <tr><td>Pollice destro</td><td>Su/giù: avanti e indietro · Lati: trasla</td></tr>
+          <tr><td>Decolla · Atterra</td><td>Decollo e atterraggio automatici</td></tr>
+          <tr><td>Casa</td><td>Ritorno a casa</td></tr>
+          <tr><td>Stop</td><td>Annulla l'automatismo e resta in hovering</td></tr>
+          <tr><td>Vista</td><td>Cambia vista</td></tr>
+          <tr><td>C · N · S in alto</td><td>Modalità Cine / Normal / Sport</td></tr>
+        </table>
+      </div>
+      <div class="no-touch">
         <h2>Tastiera</h2>
         <table class="keys">
           <tr><td>W S · A D</td><td>Stick sinistro (gas · rotazione)</td></tr>
@@ -277,7 +371,8 @@ body {
     </div>
     <div class="tip">Avvio manuale come sul vero: porta entrambi gli stick in basso verso l'interno (o l'esterno) per accendere i motori, poi spingi il gas. Per atterrare tieni il gas tutto giù finché i motori si spengono.</div>
     <div class="tip">Esercizi: resta fermo nel cerchio bianco, gira attorno al cerchio di coni guardando il centro, fai lo slalom tra i pali a destra, passa nella porta gialla. Prova la vista dal pilota: è quella che avrai al campo.</div>
-    <div class="tip">Steam Deck: in modalità Desktop apri la pagina in Chrome o Firefox e imposta per il browser il layout di controllo "Gamepad", così gli stick arrivano alla pagina come un controller.</div>
+    <div class="tip touch-only">Sul telefono: tienilo in orizzontale. Il joystick compare dove appoggi il pollice, in qualsiasi punto della metà sinistra o destra in basso, e torna al centro quando sollevi il dito. Su iPhone, per lo schermo intero: Condividi → Aggiungi alla schermata Home, poi apri il simulatore da lì.</div>
+    <div class="tip no-touch">Steam Deck: in modalità Desktop apri la pagina in Chrome o Firefox e imposta per il browser il layout di controllo "Gamepad", così gli stick arrivano alla pagina come un controller.</div>
     <div class="actions">
       <span class="pad-status" id="padStatus" data-on="0"><i></i><span id="padText">Nessun controller: muovi uno stick o premi un tasto per collegarlo</span></span>
       <button type="button" class="btn" id="btnStart">Inizia a volare</button>
@@ -336,6 +431,21 @@ window.addEventListener("error", function (e) {
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
   const lerp = (a, b, t) => a + (b - a) * t;
   const DEG = Math.PI / 180;
+
+  // ---------- Dispositivo: i comandi touch si attivano solo su iPhone, iPad e Android ----------
+  const UA = navigator.userAgent || "";
+  const IS_IPADOS = navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
+  const IS_IOS = /iPhone|iPad|iPod/i.test(UA) || IS_IPADOS;
+  const IS_ANDROID = /Android/i.test(UA);
+  const IS_MOBILE = IS_IOS || IS_ANDROID || location.hash === "#touch"; // #touch: prova da computer
+  if (IS_MOBILE) {
+    document.body.classList.add("touch");
+    // niente zoom col pizzico né scorrimento della pagina mentre si pilota
+    document.addEventListener("gesturestart", (e) => e.preventDefault());
+    document.addEventListener("touchmove", (e) => {
+      if (!(e.target.closest && e.target.closest(".overlay"))) e.preventDefault();
+    }, { passive: false });
+  }
   function rng(seed) { // generatore pseudo-casuale riproducibile
     let s = seed >>> 0;
     return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
@@ -589,6 +699,9 @@ window.addEventListener("error", function (e) {
   // ---------- Input: gamepad + tastiera ----------
   // Valori normalizzati -1..1. thr: gas (su = sali), yaw: imbardata (destra = ruota in senso orario),
   // pitch: beccheggio (su = avanti), roll: rollio (destra = trasla a destra).
+  // joystick virtuali (solo dispositivi mobili): stessi assi di un gamepad, su = negativo
+  const touch = { lx: 0, ly: 0, rx: 0, ry: 0, gimbal: 0, active: false };
+
   const input = {
     thr: 0, yaw: 0, pitch: 0, roll: 0,
     raw: { lx: 0, ly: 0, rx: 0, ry: 0 }, // stick fisici, per il visualizzatore e il CSC
@@ -679,6 +792,12 @@ window.addEventListener("error", function (e) {
       rx = clamp((rx || 0) + kb.rx, -1, 1); ry = clamp((ry || 0) + kb.ry, -1, 1);
     }
     gim += (keys.has("KeyE") ? 1 : 0) - (keys.has("KeyQ") ? 1 : 0);
+    if (IS_MOBILE) {
+      lx = clamp((lx || 0) + touch.lx, -1, 1); ly = clamp((ly || 0) + touch.ly, -1, 1);
+      rx = clamp((rx || 0) + touch.rx, -1, 1); ry = clamp((ry || 0) + touch.ry, -1, 1);
+      gim += touch.gimbal;
+      if (!pad) input.source = "touch";
+    }
 
     input.raw.lx = lx; input.raw.ly = ly; input.raw.rx = rx; input.raw.ry = ry;
     input.gimbal = clamp(gim, -1, 1);
@@ -1228,11 +1347,106 @@ window.addEventListener("error", function (e) {
     if (!el.intro.hidden) {
       el.padStatus.dataset.on = input.source === "gamepad" ? "1" : "0";
       setText(el.padText, input.source === "gamepad" ? "Controller pronto: " + input.padName + " · premi A per iniziare"
+        : IS_MOBILE ? "Comandi touch pronti · funziona anche un controller Bluetooth"
         : "Nessun controller: muovi uno stick o premi un tasto per collegarlo");
+      if (IS_MOBILE && input.source !== "gamepad") el.padStatus.dataset.on = "1";
     }
+
+    updateTouchUI();
 
     // gimbal: LT/RT, croce o Q/E (0° = orizzonte, −90° = verso il basso)
     view.gimbal = clamp(view.gimbal + input.gimbal * 60 * DEG * (1 / 20), -90 * DEG, 0);
+  }
+
+  // ---------- Comandi touch (solo iPhone, iPad, Android) ----------
+  const TOUCH_R = 56; // corsa massima del pollice, in px
+  function setupStick(side) {
+    const zone = $("tzone" + side), base = $("tbase" + side), knob = $("tknob" + side);
+    const kx = side === "L" ? "lx" : "rx", ky = side === "L" ? "ly" : "ry";
+    let id = null, cx = 0, cy = 0;
+    function rest() {
+      const r = zone.getBoundingClientRect();
+      base.style.left = (r.width * (side === "L" ? 0.42 : 0.58)) + "px";
+      base.style.top = (r.height * 0.55) + "px";
+      knob.style.transform = "";
+      base.classList.remove("on");
+    }
+    function move(e) {
+      let dx = e.clientX - cx, dy = e.clientY - cy;
+      const d = Math.hypot(dx, dy);
+      if (d > TOUCH_R) { dx *= TOUCH_R / d; dy *= TOUCH_R / d; }
+      knob.style.transform = "translate(" + dx.toFixed(1) + "px," + dy.toFixed(1) + "px)";
+      touch[kx] = dx / TOUCH_R; touch[ky] = dy / TOUCH_R;
+    }
+    zone.addEventListener("pointerdown", (e) => {
+      if (id !== null) return;
+      e.preventDefault();
+      id = e.pointerId;
+      try { zone.setPointerCapture(id); } catch (err) { /* ignora */ }
+      // la base del joystick compare sotto il pollice, ovunque tocchi nella zona
+      const r = zone.getBoundingClientRect();
+      const m = 66;
+      cx = clamp(e.clientX, r.left + m, r.right - m);
+      cy = clamp(e.clientY, r.top + m, r.bottom - m);
+      base.style.left = (cx - r.left) + "px"; base.style.top = (cy - r.top) + "px";
+      base.classList.add("on");
+      touch.active = true;
+      move(e);
+    });
+    zone.addEventListener("pointermove", (e) => { if (e.pointerId === id) { e.preventDefault(); move(e); } });
+    const end = (e) => {
+      if (e.pointerId !== id) return;
+      id = null; touch[kx] = 0; touch[ky] = 0; // al rilascio lo stick torna al centro, come quello vero
+      rest();
+    };
+    zone.addEventListener("pointerup", end);
+    zone.addEventListener("pointercancel", end);
+    zone.addEventListener("lostpointercapture", end);
+    window.addEventListener("resize", () => { if (id === null) rest(); });
+    rest();
+  }
+  function tapButton(idName, action) {
+    const b = $(idName);
+    b.addEventListener("pointerdown", (e) => { e.preventDefault(); pendingActions.push(action); });
+    b.addEventListener("click", (e) => e.preventDefault());
+  }
+  function holdButton(idName, value) {
+    const b = $(idName);
+    const on = (e) => { e.preventDefault(); touch.gimbal = value; };
+    const off = () => { touch.gimbal = 0; };
+    b.addEventListener("pointerdown", on);
+    b.addEventListener("pointerup", off); b.addEventListener("pointercancel", off); b.addEventListener("pointerleave", off);
+  }
+  function enterFullscreen() {
+    if (IS_IOS) return; // Safari su iPhone non lo permette: si usa "Aggiungi a Home"
+    const d = document.documentElement;
+    const req = d.requestFullscreen || d.webkitRequestFullscreen;
+    if (!req || document.fullscreenElement) return;
+    try {
+      const p = req.call(d, { navigationUI: "hide" });
+      if (p && p.then) p.then(() => { try { screen.orientation.lock("landscape").catch(() => {}); } catch (e) { /* ignora */ } }).catch(() => {});
+    } catch (e) { /* ignora */ }
+  }
+  if (IS_MOBILE) {
+    setupStick("L"); setupStick("R");
+    tapButton("tbTake", "toggleTakeoff");
+    tapButton("tbHome", "rth");
+    tapButton("tbStop", "cancel");
+    tapButton("tbView", "camera");
+    tapButton("tbReset", "reset");
+    holdButton("tbGimUp", 1);
+    holdButton("tbGimDown", -1);
+    $("btnStart").addEventListener("click", enterFullscreen);
+  }
+  const TAKE_LABEL = { off: "Decolla", idle: "Decolla", takeoff: "Atterra", flying: "Atterra", landing: "Annulla", rth: "Atterra", crashed: "Decolla" };
+  function updateTouchUI() {
+    if (!IS_MOBILE) return;
+    setText($("tbTake"), TAKE_LABEL[sim.state] || "Decolla");
+    $("tbReset").hidden = sim.state !== "crashed" && flight.battery > 10;
+    $("tgimbal").hidden = view.mode !== "fpv";
+    const mode1 = settings.stickMode === 1;
+    setText($("tlabelL"), mode1 ? "Avanti · rotazione" : "Gas · rotazione");
+    setText($("tlabelR"), mode1 ? "Gas · laterale" : "Avanti · laterale");
   }
 
   // ---------- Ciclo principale ----------
