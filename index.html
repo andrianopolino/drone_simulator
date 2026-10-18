@@ -232,9 +232,21 @@ body.touch .tel .label { font-size: 9px; }
 body.touch #radar { width: 84px; height: 84px; }
 body.touch .radar-wrap { padding: 4px; }
 body.touch .radar-wrap .label { display: none; }
+/* sul telefono la barra superiore sta su una sola riga */
+body.touch .topbar { flex-wrap: nowrap; padding-top: calc(6px + env(safe-area-inset-top, 0px)); padding-bottom: 6px; }
+body.touch .brand, body.touch #windChip, body.touch .modes button small { display: none; }
+body.touch .status { font-size: 11px; padding: 2px 8px; }
+body.touch .modes button { padding: 5px 12px; }
+body.touch .chip, body.touch .batt { padding: 3px 8px; font-size: 11px; }
+body.touch .icon-btn { width: 28px; height: 28px; }
+body.touch .bottom { top: calc(42px + env(safe-area-inset-top, 0px)); }
+@media (max-height: 340px) {
+  body.touch #radar { width: 70px; height: 70px; }
+  body.touch .tzone { top: 48%; }
+}
 /* sul telefono il centro dello schermo resta libero per il drone */
 body.touch .viewtag { display: none; }
-body.touch .toasts { top: calc(44px + env(safe-area-inset-top, 0px)); width: min(260px, 30vw); }
+body.touch .toasts { top: calc(44px + env(safe-area-inset-top, 0px)); width: min(240px, 28vw); }
 body.touch .toast { font-size: 12px; line-height: 1.3; padding: 5px 9px; }
 @media (orientation: portrait) {
   body.touch .rotate-hint {
@@ -411,13 +423,22 @@ body.touch .toast { font-size: 12px; line-height: 1.3; padding: 5px 9px; }
   </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" crossorigin="anonymous"></script>
 <script>
 // se qualcosa va storto, mostra l'errore a schermo (utile per capire il problema)
+function showError(msg) {
+  var box = document.getElementById("errbox");
+  if (!box) {
+    box = document.body.appendChild(Object.assign(document.createElement("pre"), { id: "errbox", title: "Tocca per chiudere" }));
+    box.style.cssText = "position:fixed;left:50%;transform:translateX(-50%);top:calc(8px + env(safe-area-inset-top,0px));max-width:min(560px,90vw);z-index:99;margin:0;padding:8px 12px;background:#3a0e0e;color:#ffd7d7;font:11px/1.4 monospace;white-space:pre-wrap;border-radius:8px";
+    box.addEventListener("click", function () { box.remove(); });
+  }
+  if (box.childElementCount < 3) box.appendChild(document.createElement("div")).textContent = msg + "  (tocca per chiudere)";
+}
 window.addEventListener("error", function (e) {
-  var box = document.getElementById("errbox") || document.body.appendChild(Object.assign(document.createElement("pre"), { id: "errbox" }));
-  box.style.cssText = "position:fixed;left:16px;right:16px;bottom:16px;z-index:99;margin:0;padding:12px;background:#3a0e0e;color:#ffd7d7;font:12px/1.4 monospace;white-space:pre-wrap;border-radius:8px";
-  box.textContent += "Errore: " + (e.message || e) + (e.filename ? "  (" + e.filename.split("/").pop() + ":" + e.lineno + ")" : "") + "\n";
+  // "Script error." senza dettagli arriva da script esterni o estensioni del browser: non è utile mostrarlo
+  if (!e.filename && /^script error\.?$/i.test(e.message || "")) { console.warn("Errore esterno ignorato:", e.message); return; }
+  showError("Errore: " + (e.message || e) + (e.filename ? "  (" + e.filename.split("/").pop() + ":" + e.lineno + ")" : ""));
 });
 </script>
 <script>
@@ -1188,6 +1209,11 @@ window.addEventListener("error", function (e) {
   const setHTML = (node, html) => { if (node.innerHTML !== html) node.innerHTML = html; };
   const fmt = (v, d) => (Math.abs(v) < 0.05 && d ? 0 : v).toFixed(d);
 
+  if (IS_MOBILE) {
+    const short = ["Alt. H", "Dist. D", "Vel. O", "Vel. V"];
+    document.querySelectorAll(".telemetry .label").forEach((n, i) => { if (short[i]) n.textContent = short[i]; });
+  }
+
   // modalità di volo cliccabili
   ["C", "N", "S"].forEach((k) => $("mode" + k).addEventListener("click", (e) => { setMode(k); e.currentTarget.blur(); }));
 
@@ -1457,7 +1483,16 @@ window.addEventListener("error", function (e) {
   let last = performance.now();
   const STEP = 1 / 120;
   let acc = 0;
+  let frameErrors = 0;
   function frame(now) {
+    requestAnimationFrame(frame); // il prossimo frame è già prenotato, anche se questo fallisce
+    try { tick(now); } catch (err) {
+      frameErrors++;
+      if (frameErrors <= 3) console.error(err);
+      if (frameErrors === 1 && typeof showError === "function") showError("Errore: " + (err && err.message ? err.message : err));
+    }
+  }
+  function tick(now) {
     let dt = Math.min(0.05, (now - last) / 1000);
     last = now;
     if (typeof readInput === "function") readInput(dt);
@@ -1472,7 +1507,6 @@ window.addEventListener("error", function (e) {
     updateCamera(dt);
     if (typeof updateHUD === "function") updateHUD(dt);
     renderer.render(scene, camera);
-    requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
 })();
