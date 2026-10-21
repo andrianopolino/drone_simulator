@@ -5,6 +5,10 @@ Il drone si comporta come un DJI in modalità GPS: gli stick chiedono una veloci
 
 Non è un prodotto DJI e non è affiliato a DJI. La fisica è approssimata: serve per fare pratica con gli stick, non come replica esatta del drone.
 
+## In English
+
+Browser-based 3D flight simulator for practicing with a DJI Mini 2 (not affiliated with DJI). Pick **ENG** on the start screen to play in English. Works with gamepads, Steam Deck, keyboard and touch (iPhone, iPad, Android).
+
 ## Come si usa
 
 Apri `index.html` in Chrome (o in un altro browser moderno), oppure usa la versione online su GitHub Pages.
@@ -20,6 +24,7 @@ Serve una connessione internet al primo avvio, per scaricare il motore 3D (Three
 - Tre viste: dietro al drone, camera del drone, dal pilota
 - Percorso di allenamento: cerchio di coni, slalom di pali, porta
 - Comandi touch su iPhone, iPad e Android
+- Italiano e inglese: la lingua si sceglie all'avvio (ITA / ENG) e si può cambiare dalle impostazioni
 
 ## Comandi
 

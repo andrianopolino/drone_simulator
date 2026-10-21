@@ -179,6 +179,17 @@ body {
 .field output { font-family: var(--font-data); font-size: 12px; color: var(--muted); }
 .padfocus { outline: 2px solid var(--amber) !important; outline-offset: 3px; }
 .field select:focus-visible, .field input:focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; }
+.lang-sheet { width: min(460px, 100%); align-items: center; text-align: center; }
+.lang-choices { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; }
+.lang-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 10px; cursor: pointer;
+  background: rgba(255, 255, 255, 0.04); color: var(--fg); border: 1px solid var(--line); border-radius: 12px;
+  padding: 16px 22px; touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+}
+.lang-btn .flag { width: 96px; height: 64px; border-radius: 4px; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25); }
+.lang-btn b { font: 700 20px/1 var(--font-display); letter-spacing: 0.14em; }
+.lang-btn:hover, .lang-btn.current { border-color: var(--amber); background: rgba(242, 177, 52, 0.1); }
+.lang-btn:focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; }
 .tip { font-size: 13px; color: #c9d4df; border-left: 3px solid var(--amber); padding: 8px 12px; background: rgba(242, 177, 52, 0.06); line-height: 1.5; }
 
 /* comandi touch: visibili solo con la classe .touch (iPhone, iPad, Android) */
@@ -269,42 +280,42 @@ body.touch .toast { font-size: 12px; line-height: 1.3; padding: 5px 9px; }
 @media (prefers-reduced-motion: reduce) { .toast { animation: none; } }
 </style>
 
-<canvas id="scene" aria-label="Simulatore di volo 3D"></canvas>
+<canvas id="scene" aria-label="Simulatore di volo 3D" data-i18n-attr="aria-label:aScene"></canvas>
 <div class="touchpad" id="touchpad" aria-hidden="true">
   <div class="tzone" id="tzoneL"><div class="tbase" id="tbaseL"><span class="tlabel" id="tlabelL">Gas · rotazione</span><div class="tknob" id="tknobL"></div></div></div>
   <div class="tzone" id="tzoneR"><div class="tbase" id="tbaseR"><span class="tlabel" id="tlabelR">Avanti · laterale</span><div class="tknob" id="tknobR"></div></div></div>
 </div>
 <div class="tbtns" id="tbtns">
   <button type="button" class="tbtn tbtn-main" id="tbTake">Decolla</button>
-  <button type="button" class="tbtn" id="tbHome">Casa</button>
+  <button type="button" class="tbtn" id="tbHome" data-i18n="bHome">Casa</button>
   <button type="button" class="tbtn" id="tbStop">Stop</button>
-  <button type="button" class="tbtn" id="tbView">Vista</button>
-  <button type="button" class="tbtn" id="tbReset">Riparti</button>
+  <button type="button" class="tbtn" id="tbView" data-i18n="bView">Vista</button>
+  <button type="button" class="tbtn" id="tbReset" data-i18n="bReset">Riparti</button>
 </div>
 <div class="tgimbal" id="tgimbal" hidden>
-  <button type="button" class="tbtn" id="tbGimUp" aria-label="Gimbal su">Gimbal ▲</button>
-  <button type="button" class="tbtn" id="tbGimDown" aria-label="Gimbal giù">Gimbal ▼</button>
+  <button type="button" class="tbtn" id="tbGimUp" aria-label="Gimbal su" data-i18n-attr="aria-label:aGimUp">Gimbal ▲</button>
+  <button type="button" class="tbtn" id="tbGimDown" aria-label="Gimbal giù" data-i18n-attr="aria-label:aGimDown">Gimbal ▼</button>
 </div>
-<div class="rotate-hint" aria-live="polite">Gira il telefono in orizzontale per pilotare</div>
+<div class="rotate-hint" aria-live="polite" data-i18n="rotate">Gira il telefono in orizzontale per pilotare</div>
 <div class="hud" id="hud">
   <header class="topbar">
     <div class="tb-group">
       <span class="brand">CAMPO VOLO</span>
       <span class="status" id="status" data-s="off">Motori spenti</span>
     </div>
-    <div class="modes panel" role="group" aria-label="Modalità di volo">
+    <div class="modes panel" role="group" aria-label="Modalità di volo" data-i18n-attr="aria-label:aModes">
       <button type="button" id="modeC" data-mode="C" aria-pressed="false"><b>C</b><small>Cine</small></button>
       <button type="button" id="modeN" data-mode="N" aria-pressed="true"><b>N</b><small>Normal</small></button>
       <button type="button" id="modeS" data-mode="S" aria-pressed="false"><b>S</b><small>Sport</small></button>
     </div>
     <div class="tb-group">
-      <span class="chip panel mono" id="windChip" title="Vento">Vento 0 m/s</span>
-      <span class="batt panel" id="batt" data-lvl="ok" title="Batteria">
+      <span class="chip panel mono" id="windChip" title="Vento" data-i18n-attr="title:aWind">Vento 0 m/s</span>
+      <span class="batt panel" id="batt" data-lvl="ok" title="Batteria" data-i18n-attr="title:aBatt">
         <span class="batt-bar"><i id="battFill" style="width:100%"></i></span>
         <b class="mono" id="battPct">100%</b>
       </span>
-      <span class="chip panel mono" id="ftime" title="Tempo di volo">00:00</span>
-      <button type="button" class="icon-btn" id="btnSettings" aria-label="Impostazioni">
+      <span class="chip panel mono" id="ftime" title="Tempo di volo" data-i18n-attr="title:aTime">00:00</span>
+      <button type="button" class="icon-btn" id="btnSettings" aria-label="Impostazioni" data-i18n-attr="aria-label:aSettings">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg>
       </button>
     </div>
@@ -318,13 +329,13 @@ body.touch .toast { font-size: 12px; line-height: 1.3; padding: 5px 9px; }
   <div class="viewtag panel" id="viewTag">Vista: dietro al drone</div>
 
   <div class="bottom">
-    <section class="telemetry panel" aria-label="Telemetria">
-      <div class="tel"><span class="label">Altezza H</span><b id="tH">0.0<small>m</small></b></div>
-      <div class="tel"><span class="label">Distanza D</span><b id="tD">0<small>m</small></b></div>
-      <div class="tel"><span class="label">Vel. orizz.</span><b id="tHS">0.0<small>m/s</small></b></div>
-      <div class="tel"><span class="label">Vel. vert.</span><b id="tVS">0.0<small>m/s</small></b></div>
+    <section class="telemetry panel" aria-label="Telemetria" data-i18n-attr="aria-label:aTele">
+      <div class="tel"><span class="label" data-i18n="tH">Altezza H</span><b id="tH">0.0<small>m</small></b></div>
+      <div class="tel"><span class="label" data-i18n="tD">Distanza D</span><b id="tD">0<small>m</small></b></div>
+      <div class="tel"><span class="label" data-i18n="tHS">Vel. orizz.</span><b id="tHS">0.0<small>m/s</small></b></div>
+      <div class="tel"><span class="label" data-i18n="tVS">Vel. vert.</span><b id="tVS">0.0<small>m/s</small></b></div>
     </section>
-    <section class="sticks panel" aria-label="Posizione degli stick">
+    <section class="sticks panel" aria-label="Posizione degli stick" data-i18n-attr="aria-label:aSticks">
       <div class="stick"><div class="stick-box"><span class="stick-dot" id="dotL"></span></div><span class="label" id="lblL">Sinistro<br>gas · rotazione</span></div>
       <div class="stick"><div class="stick-box"><span class="stick-dot" id="dotR"></span></div><span class="label" id="lblR">Destro<br>avanti · laterale</span></div>
     </section>
@@ -335,17 +346,30 @@ body.touch .toast { font-size: 12px; line-height: 1.3; padding: 5px 9px; }
   </div>
 </div>
 
-<div class="overlay" id="intro">
+<div class="overlay" id="langPick">
+  <div class="sheet panel lang-sheet" role="dialog" aria-labelledby="langTitle">
+    <div>
+      <span class="label">Campo Volo Mini</span>
+      <h1 id="langTitle">Lingua · Language</h1>
+    </div>
+    <div class="lang-choices" role="group" aria-label="Lingua · Language">
+      <button type="button" class="lang-btn" id="langIT" data-lang="it"><svg class="flag" viewBox="0 0 3 2" aria-hidden="true"><rect width="1" height="2" fill="#009246"></rect><rect x="1" width="1" height="2" fill="#ffffff"></rect><rect x="2" width="1" height="2" fill="#ce2b37"></rect></svg><b>ITA</b></button>
+      <button type="button" class="lang-btn" id="langEN" data-lang="en"><svg class="flag" viewBox="0 0 60 30" aria-hidden="true"><clipPath id="ukS"><path d="M0,0 v30 h60 v-30 z"></path></clipPath><clipPath id="ukT"><path d="M30,15 h30 v15 z v15 h-30 z h-30 v-15 z v-15 h30 z"></path></clipPath><g clip-path="url(#ukS)"><path d="M0,0 v30 h60 v-30 z" fill="#012169"></path><path d="M0,0 L60,30 M60,0 L0,30" stroke="#ffffff" stroke-width="6"></path><path d="M0,0 L60,30 M60,0 L0,30" clip-path="url(#ukT)" stroke="#c8102e" stroke-width="4"></path><path d="M30,0 v30 M0,15 h60" stroke="#ffffff" stroke-width="10"></path><path d="M30,0 v30 M0,15 h60" stroke="#c8102e" stroke-width="6"></path></g></svg><b>ENG</b></button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="intro" hidden>
   <div class="sheet panel" role="dialog" aria-labelledby="introTitle">
     <div>
-      <span class="label">Allenamento per DJI Mini 2 · Mode 2</span>
+      <span class="label" data-i18n="introKicker">Allenamento per DJI Mini 2 · Mode 2</span>
       <h1 id="introTitle">Campo Volo Mini</h1>
     </div>
-    <p>Il drone si comporta come un DJI in modalità GPS: gli stick chiedono una velocità, e quando li lasci il drone frena e resta fermo in aria. Il drone è in scala reale, quindi da lontano sembra piccolo come dal vero. Luci rosse davanti, luce verde lampeggiante dietro.</p>
+    <p data-i18n="introText">Il drone si comporta come un DJI in modalità GPS: gli stick chiedono una velocità, e quando li lasci il drone frena e resta fermo in aria. Il drone è in scala reale, quindi da lontano sembra piccolo come dal vero. Luci rosse davanti, luce verde lampeggiante dietro.</p>
     <div class="cols">
       <div>
         <h2>Controller · Steam Deck</h2>
-        <table class="keys">
+        <table class="keys" data-i18n="keysPad">
           <tr><td>Stick sinistro</td><td>Su/giù: sali e scendi · Lati: ruota</td></tr>
           <tr><td>Stick destro</td><td>Su/giù: avanti e indietro · Lati: trasla</td></tr>
           <tr><td>A</td><td>Decollo / atterraggio automatico</td></tr>
@@ -359,7 +383,7 @@ body.touch .toast { font-size: 12px; line-height: 1.3; padding: 5px 9px; }
       </div>
       <div class="touch-only">
         <h2>Touch</h2>
-        <table class="keys">
+        <table class="keys" data-i18n="keysTouch">
           <tr><td>Pollice sinistro</td><td>Su/giù: sali e scendi · Lati: ruota</td></tr>
           <tr><td>Pollice destro</td><td>Su/giù: avanti e indietro · Lati: trasla</td></tr>
           <tr><td>Decolla · Atterra</td><td>Decollo e atterraggio automatici</td></tr>
@@ -370,8 +394,8 @@ body.touch .toast { font-size: 12px; line-height: 1.3; padding: 5px 9px; }
         </table>
       </div>
       <div class="no-touch">
-        <h2>Tastiera</h2>
-        <table class="keys">
+        <h2 data-i18n="hKb">Tastiera</h2>
+        <table class="keys" data-i18n="keysKb">
           <tr><td>W S · A D</td><td>Stick sinistro (gas · rotazione)</td></tr>
           <tr><td>Frecce</td><td>Stick destro (avanti · laterale)</td></tr>
           <tr><td>T</td><td>Decollo / atterraggio automatico</td></tr>
@@ -383,42 +407,46 @@ body.touch .toast { font-size: 12px; line-height: 1.3; padding: 5px 9px; }
         </table>
       </div>
     </div>
-    <div class="tip">Avvio manuale come sul vero: porta entrambi gli stick in basso verso l'interno (o l'esterno) per accendere i motori, poi spingi il gas. Per atterrare tieni il gas tutto giù finché i motori si spengono.</div>
-    <div class="tip">Esercizi: resta fermo nel cerchio bianco, gira attorno al cerchio di coni guardando il centro, fai lo slalom tra i pali a destra, passa nella porta gialla. Prova la vista dal pilota: è quella che avrai al campo.</div>
-    <div class="tip touch-only">Sul telefono: tienilo in orizzontale. Il joystick compare dove appoggi il pollice, in qualsiasi punto della metà sinistra o destra in basso, e torna al centro quando sollevi il dito. Su iPhone, per lo schermo intero: Condividi → Aggiungi alla schermata Home, poi apri il simulatore da lì.</div>
-    <div class="tip no-touch">Steam Deck: in modalità Desktop apri la pagina in Chrome o Firefox e imposta per il browser il layout di controllo "Gamepad", così gli stick arrivano alla pagina come un controller.</div>
+    <div class="tip" data-i18n="tipStart">Avvio manuale come sul vero: porta entrambi gli stick in basso verso l'interno (o l'esterno) per accendere i motori, poi spingi il gas. Per atterrare tieni il gas tutto giù finché i motori si spengono.</div>
+    <div class="tip" data-i18n="tipDrills">Esercizi: resta fermo nel cerchio bianco, gira attorno al cerchio di coni guardando il centro, fai lo slalom tra i pali a destra, passa nella porta gialla. Prova la vista dal pilota: è quella che avrai al campo.</div>
+    <div class="tip touch-only" data-i18n="tipPhone">Sul telefono: tienilo in orizzontale. Il joystick compare dove appoggi il pollice, in qualsiasi punto della metà sinistra o destra in basso, e torna al centro quando sollevi il dito. Su iPhone, per lo schermo intero: Condividi → Aggiungi alla schermata Home, poi apri il simulatore da lì.</div>
+    <div class="tip no-touch" data-i18n="tipDeck">Steam Deck: in modalità Desktop apri la pagina in Chrome o Firefox e imposta per il browser il layout di controllo "Gamepad", così gli stick arrivano alla pagina come un controller.</div>
     <div class="actions">
       <span class="pad-status" id="padStatus" data-on="0"><i></i><span id="padText">Nessun controller: muovi uno stick o premi un tasto per collegarlo</span></span>
-      <button type="button" class="btn" id="btnStart">Inizia a volare</button>
+      <button type="button" class="btn" id="btnStart" data-i18n="bStart">Inizia a volare</button>
     </div>
   </div>
 </div>
 
 <div class="overlay" id="settingsPanel" hidden>
   <div class="sheet panel" role="dialog" aria-labelledby="setTitle">
-    <h1 id="setTitle">Impostazioni</h1>
+    <h1 id="setTitle" data-i18n="setTitle">Impostazioni</h1>
     <div>
       <div class="field">
-        <label for="optMode">Modalità stick<small>Mode 2 è quella predefinita dei telecomandi DJI</small></label>
-        <select id="optMode"><option value="2">Mode 2 · gas a sinistra</option><option value="1">Mode 1 · gas a destra</option></select>
+        <label for="optMode" data-i18n="lMode">Modalità stick<small>Mode 2 è quella predefinita dei telecomandi DJI</small></label>
+        <select id="optMode"><option value="2" data-i18n="oMode2">Mode 2 · gas a sinistra</option><option value="1" data-i18n="oMode1">Mode 1 · gas a destra</option></select>
       </div>
       <div class="field">
-        <label for="optDead">Zona morta<small>Ignora i piccoli movimenti attorno al centro</small></label>
+        <label for="optDead" data-i18n="lDead">Zona morta<small>Ignora i piccoli movimenti attorno al centro</small></label>
         <div><input type="range" id="optDead" min="0" max="0.25" step="0.01"><output id="outDead"></output></div>
       </div>
       <div class="field">
-        <label for="optExpo">Expo<small>Più alto = più dolce attorno al centro</small></label>
+        <label for="optExpo" data-i18n="lExpo">Expo<small>Più alto = più dolce attorno al centro</small></label>
         <div><input type="range" id="optExpo" min="0" max="0.8" step="0.05"><output id="outExpo"></output></div>
       </div>
       <div class="field">
-        <label for="optWind">Vento<small>Il GPS lo compensa, ma le raffiche spostano un po' il drone</small></label>
-        <select id="optWind"><option value="none">Assente</option><option value="light">Leggero · 3 m/s</option><option value="moderate">Moderato · 6 m/s</option><option value="strong">Forte · 9 m/s</option></select>
+        <label for="optLang">Lingua · Language</label>
+        <select id="optLang"><option value="it">ITA · Italiano</option><option value="en">ENG · English</option></select>
+      </div>
+      <div class="field">
+        <label for="optWind" data-i18n="lWind">Vento<small>Il GPS lo compensa, ma le raffiche spostano un po' il drone</small></label>
+        <select id="optWind"><option value="none" data-i18n="oWindNone">Assente</option><option value="light" data-i18n="oWindLight">Leggero · 3 m/s</option><option value="moderate" data-i18n="oWindMod">Moderato · 6 m/s</option><option value="strong" data-i18n="oWindStrong">Forte · 9 m/s</option></select>
       </div>
     </div>
     <div class="actions">
-      <span class="pad-status">Controller: croce su/giù per muoverti, sinistra/destra per cambiare, A conferma, B chiude, Y rivedi i comandi</span>
-      <button type="button" class="btn ghost" id="btnGuide">Rivedi i comandi</button>
-      <button type="button" class="btn" id="btnCloseSet">Chiudi</button>
+      <span class="pad-status" data-i18n="setHelp">Controller: croce su/giù per muoverti, sinistra/destra per cambiare, A conferma, B chiude, Y rivedi i comandi</span>
+      <button type="button" class="btn ghost" id="btnGuide" data-i18n="bGuide">Rivedi i comandi</button>
+      <button type="button" class="btn" id="btnCloseSet" data-i18n="bClose">Chiudi</button>
     </div>
   </div>
 </div>
@@ -429,16 +457,16 @@ body.touch .toast { font-size: 12px; line-height: 1.3; padding: 5px 9px; }
 function showError(msg) {
   var box = document.getElementById("errbox");
   if (!box) {
-    box = document.body.appendChild(Object.assign(document.createElement("pre"), { id: "errbox", title: "Tocca per chiudere" }));
+    box = document.body.appendChild(Object.assign(document.createElement("pre"), { id: "errbox", title: window.__lang === "en" ? "Tap to close" : "Tocca per chiudere" }));
     box.style.cssText = "position:fixed;left:50%;transform:translateX(-50%);top:calc(8px + env(safe-area-inset-top,0px));max-width:min(560px,90vw);z-index:99;margin:0;padding:8px 12px;background:#3a0e0e;color:#ffd7d7;font:11px/1.4 monospace;white-space:pre-wrap;border-radius:8px";
     box.addEventListener("click", function () { box.remove(); });
   }
-  if (box.childElementCount < 3) box.appendChild(document.createElement("div")).textContent = msg + "  (tocca per chiudere)";
+  if (box.childElementCount < 3) box.appendChild(document.createElement("div")).textContent = msg + (window.__lang === "en" ? "  (tap to close)" : "  (tocca per chiudere)");
 }
 window.addEventListener("error", function (e) {
   // "Script error." senza dettagli arriva da script esterni o estensioni del browser: non è utile mostrarlo
   if (!e.filename && /^script error\.?$/i.test(e.message || "")) { console.warn("Errore esterno ignorato:", e.message); return; }
-  showError("Errore: " + (e.message || e) + (e.filename ? "  (" + e.filename.split("/").pop() + ":" + e.lineno + ")" : ""));
+  showError((window.__lang === "en" ? "Error: " : "Errore: ") + (e.message || e) + (e.filename ? "  (" + e.filename.split("/").pop() + ":" + e.lineno + ")" : ""));
 });
 </script>
 <script>
@@ -469,6 +497,220 @@ window.addEventListener("error", function (e) {
       if (!(e.target.closest && e.target.closest(".overlay"))) e.preventDefault();
     }, { passive: false });
   }
+  // ---------- Lingua (ITA / ENG) ----------
+  // Testi fissi dell'HTML: attributo data-i18n="chiave" (l'italiano è quello scritto nell'HTML).
+  // Attributi: data-i18n-attr="aria-label:chiave;title:chiave". Testi del codice: i18n("chiave", valori...).
+  const STATIC_EN = {
+      "aScene": "3D flight simulator",
+      "bHome": "Home",
+      "bView": "View",
+      "bReset": "Restart",
+      "aGimUp": "Gimbal up",
+      "aGimDown": "Gimbal down",
+      "rotate": "Turn your phone sideways to fly",
+      "aModes": "Flight mode",
+      "aWind": "Wind",
+      "aBatt": "Battery",
+      "aTime": "Flight time",
+      "aSettings": "Settings",
+      "aTele": "Telemetry",
+      "tH": "Height H",
+      "tD": "Distance D",
+      "tHS": "Horiz. speed",
+      "tVS": "Vert. speed",
+      "aSticks": "Stick position",
+      "introKicker": "Training for DJI Mini 2 · Mode 2",
+      "introText": "The drone behaves like a DJI in GPS mode: the sticks ask for a speed, and when you let go the drone brakes and holds still in the air. The drone is real-size, so from a distance it looks as small as the real one. Red lights at the front, blinking green light at the back.",
+      "keysPad": "\n          <tr><td>Left stick</td><td>Up/down: climb and descend · Sides: rotate</td></tr>\n          <tr><td>Right stick</td><td>Up/down: forward and back · Sides: move sideways</td></tr>\n          <tr><td>A</td><td>Auto takeoff / landing</td></tr>\n          <tr><td>Y</td><td>Return to home</td></tr>\n          <tr><td>B</td><td>Cancel the automatic action</td></tr>\n          <tr><td>X</td><td>Change view</td></tr>\n          <tr><td>LB · RB</td><td>Cine / Normal / Sport mode</td></tr>\n          <tr><td>LT · RT</td><td>Tilt the gimbal</td></tr>\n          <tr><td>Start · View</td><td>Restart · Settings</td></tr>\n        ",
+      "keysTouch": "\n          <tr><td>Left thumb</td><td>Up/down: climb and descend · Sides: rotate</td></tr>\n          <tr><td>Right thumb</td><td>Up/down: forward and back · Sides: move sideways</td></tr>\n          <tr><td>Take off · Land</td><td>Auto takeoff and landing</td></tr>\n          <tr><td>Home</td><td>Return to home</td></tr>\n          <tr><td>Stop</td><td>Cancel the automatic action and hover</td></tr>\n          <tr><td>View</td><td>Change view</td></tr>\n          <tr><td>C · N · S at the top</td><td>Cine / Normal / Sport mode</td></tr>\n        ",
+      "keysKb": "\n          <tr><td>W S · A D</td><td>Left stick (throttle · yaw)</td></tr>\n          <tr><td>Arrows</td><td>Right stick (forward · sideways)</td></tr>\n          <tr><td>T</td><td>Auto takeoff / landing</td></tr>\n          <tr><td>H · B</td><td>Return to home · Cancel</td></tr>\n          <tr><td>C</td><td>Change view</td></tr>\n          <tr><td>1 2 3 · M</td><td>Cine / Normal / Sport mode</td></tr>\n          <tr><td>Q · E</td><td>Tilt the gimbal</td></tr>\n          <tr><td>R · P</td><td>Restart · Settings</td></tr>\n        ",
+      "hKb": "Keyboard",
+      "tipStart": "Manual start, like the real drone: push both sticks down and inward (or outward) to start the motors, then push the throttle up. To land, hold the throttle all the way down until the motors stop.",
+      "tipDrills": "Exercises: hover still in the white circle, fly around the ring of cones while facing the center, slalom between the poles on the right, fly through the yellow gate. Try the pilot view: it's what you'll see at the field.",
+      "tipPhone": "On a phone: hold it sideways. The joystick appears wherever you put your thumb in the lower left or right half, and returns to center when you lift your finger. On iPhone, for full screen: Share → Add to Home Screen, then open the simulator from there.",
+      "tipDeck": "Steam Deck: in Desktop mode, open the page in Chrome or Firefox and set the browser's controller layout to \"Gamepad\", so the sticks reach the page as a controller.",
+      "bStart": "Start flying",
+      "setTitle": "Settings",
+      "lMode": "Stick mode<small>Mode 2 is the default on DJI remote controllers</small>",
+      "oMode2": "Mode 2 · throttle on the left",
+      "oMode1": "Mode 1 · throttle on the right",
+      "lDead": "Deadzone<small>Ignores small movements around the center</small>",
+      "lExpo": "Expo<small>Higher = softer around the center</small>",
+      "lWind": "Wind<small>GPS compensates for it, but gusts push the drone a little</small>",
+      "oWindNone": "None",
+      "oWindLight": "Light · 3 m/s",
+      "oWindMod": "Moderate · 6 m/s",
+      "oWindStrong": "Strong · 9 m/s",
+      "setHelp": "Controller: D-pad up/down to move, left/right to change, A confirms, B closes, Y shows the controls",
+      "bGuide": "Show controls",
+      "bClose": "Close"
+  };
+  const TXT = {
+    it: {
+        "padConnected": "Controller collegato: {0}",
+        "padDisconnected": "Controller scollegato",
+        "battLowTakeoff": "Batteria troppo scarica per decollare: premi R per cambiarla",
+        "motorsOn": "Motori avviati: spingi il gas in su per decollare",
+        "motorsOff": "Motori spenti",
+        "motorsOffIdle": "Motori spenti: nessun decollo entro 8 secondi",
+        "landed": "Atterrato",
+        "landedOff": "Atterrato: motori spenti",
+        "crash": "Collisione! Premi R o Start per ripartire",
+        "resetDone": "Drone sulla piazzola, batteria al 100%",
+        "modeSet": "Modalità {0} · max {1} m/s",
+        "rthStart": "Ritorno a casa: salgo a {0} m e rientro. B per annullare",
+        "autoTakeoff": "Decollo automatico",
+        "autoLand": "Atterraggio automatico. B per annullare",
+        "landCancel": "Atterraggio annullato",
+        "rthCancel": "Ritorno a casa annullato",
+        "forcedNoCancel": "Batteria critica: l'atterraggio non si può annullare",
+        "cmdCancel": "Comando annullato: hovering",
+        "viewChase": "Vista: dietro al drone",
+        "viewFpv": "Vista: camera del drone",
+        "viewGround": "Vista: dal pilota (come dal vero)",
+        "hoverReady": "Hovering a 1,2 m: ora tocca a te",
+        "rthSticks": "Ritorno a casa interrotto dagli stick",
+        "overPad": "Sopra la piazzola: atterraggio",
+        "altLimit": "Limite di altitudine: 120 m",
+        "distLimit": "Limite dell'area di volo: {0} m",
+        "batt20": "Batteria al 20%: è ora di rientrare",
+        "battCrit": "Batteria critica: atterraggio automatico",
+        "st_off": "Motori spenti",
+        "st_idle": "Motori accesi",
+        "st_takeoff": "Decollo",
+        "st_flying": "In volo",
+        "st_landing": "Atterraggio",
+        "st_rth": "Ritorno a casa",
+        "st_crashed": "Collisione",
+        "windNone": "Vento assente",
+        "windVal": "Vento {0} m/s",
+        "lblLm1": "Sinistro<br>avanti · rotazione",
+        "lblLm2": "Sinistro<br>gas · rotazione",
+        "lblRm1": "Destro<br>gas · laterale",
+        "lblRm2": "Destro<br>avanti · laterale",
+        "radarScale": "Raggio {0} m · N in alto",
+        "tagFpv": "Camera del drone · gimbal −{0}°",
+        "tagGround": "Vista dal pilota",
+        "tagChase": "Vista dietro al drone",
+        "padReady": "Controller pronto: {0} · premi A per iniziare",
+        "touchReady": "Comandi touch pronti · funziona anche un controller Bluetooth",
+        "noPad": "Nessun controller: muovi uno stick o premi un tasto per collegarlo",
+        "take_off": "Decolla",
+        "take_idle": "Decolla",
+        "take_takeoff": "Atterra",
+        "take_flying": "Atterra",
+        "take_landing": "Annulla",
+        "take_rth": "Atterra",
+        "take_crashed": "Decolla",
+        "tlM1L": "Avanti · rotazione",
+        "tlM2L": "Gas · rotazione",
+        "tlM1R": "Gas · laterale",
+        "tlM2R": "Avanti · laterale",
+        "shortH": "Alt. H",
+        "shortD": "Dist. D",
+        "shortHS": "Vel. O",
+        "shortVS": "Vel. V",
+        "error": "Errore"
+  },
+    en: {
+        "padConnected": "Controller connected: {0}",
+        "padDisconnected": "Controller disconnected",
+        "battLowTakeoff": "Battery too low to take off: press R to swap it",
+        "motorsOn": "Motors started: push the throttle up to take off",
+        "motorsOff": "Motors off",
+        "motorsOffIdle": "Motors off: no takeoff within 8 seconds",
+        "landed": "Landed",
+        "landedOff": "Landed: motors off",
+        "crash": "Collision! Press R or Start to restart",
+        "resetDone": "Drone on the pad, battery at 100%",
+        "modeSet": "{0} mode · max {1} m/s",
+        "rthStart": "Return to home: climbing to {0} m and flying back. B to cancel",
+        "autoTakeoff": "Auto takeoff",
+        "autoLand": "Auto landing. B to cancel",
+        "landCancel": "Landing cancelled",
+        "rthCancel": "Return to home cancelled",
+        "forcedNoCancel": "Critical battery: landing can't be cancelled",
+        "cmdCancel": "Command cancelled: hovering",
+        "viewChase": "View: behind the drone",
+        "viewFpv": "View: drone camera",
+        "viewGround": "View: from the pilot (like in real life)",
+        "hoverReady": "Hovering at 1.2 m: your turn",
+        "rthSticks": "Return to home interrupted by the sticks",
+        "overPad": "Above the pad: landing",
+        "altLimit": "Altitude limit: 120 m",
+        "distLimit": "Flight area limit: {0} m",
+        "batt20": "Battery at 20%: time to head back",
+        "battCrit": "Critical battery: auto landing",
+        "st_off": "Motors off",
+        "st_idle": "Motors on",
+        "st_takeoff": "Taking off",
+        "st_flying": "Flying",
+        "st_landing": "Landing",
+        "st_rth": "Returning home",
+        "st_crashed": "Crashed",
+        "windNone": "No wind",
+        "windVal": "Wind {0} m/s",
+        "lblLm1": "Left<br>forward · yaw",
+        "lblLm2": "Left<br>throttle · yaw",
+        "lblRm1": "Right<br>throttle · sideways",
+        "lblRm2": "Right<br>forward · sideways",
+        "radarScale": "Range {0} m · N up",
+        "tagFpv": "Drone camera · gimbal −{0}°",
+        "tagGround": "Pilot view",
+        "tagChase": "Behind the drone",
+        "padReady": "Controller ready: {0} · press A to start",
+        "touchReady": "Touch controls ready · a Bluetooth controller works too",
+        "noPad": "No controller: move a stick or press a button to connect it",
+        "take_off": "Take off",
+        "take_idle": "Take off",
+        "take_takeoff": "Land",
+        "take_flying": "Land",
+        "take_landing": "Cancel",
+        "take_rth": "Land",
+        "take_crashed": "Take off",
+        "tlM1L": "Forward · yaw",
+        "tlM2L": "Throttle · yaw",
+        "tlM1R": "Throttle · sideways",
+        "tlM2R": "Forward · sideways",
+        "shortH": "Alt. H",
+        "shortD": "Dist. D",
+        "shortHS": "H. spd",
+        "shortVS": "V. spd",
+        "error": "Error"
+  },
+  };
+  let lang = "it";
+  try {
+    const savedLang = localStorage.getItem("campovolo-lang");
+    lang = savedLang === "en" || savedLang === "it" ? savedLang : (/^it\b/i.test(navigator.language || "") ? "it" : "en");
+  } catch (e) { lang = /^it\b/i.test(navigator.language || "") ? "it" : "en"; }
+  function i18n(key) {
+    let str = (TXT[lang] && TXT[lang][key]) || TXT.it[key] || key;
+    for (let i = 1; i < arguments.length; i++) str = str.split("{" + (i - 1) + "}").join(String(arguments[i]));
+    return str;
+  }
+  const langHooks = [];
+  function applyLang(next) {
+    lang = next === "en" ? "en" : "it";
+    window.__lang = lang;
+    document.documentElement.lang = lang;
+    try { localStorage.setItem("campovolo-lang", lang); } catch (e) { /* ignora */ }
+    document.querySelectorAll("[data-i18n]").forEach((n) => {
+      if (n.dataset.it === undefined) n.dataset.it = n.innerHTML;
+      const html = lang === "en" ? STATIC_EN[n.dataset.i18n] : n.dataset.it;
+      if (html !== undefined && n.innerHTML !== html) n.innerHTML = html;
+    });
+    document.querySelectorAll("[data-i18n-attr]").forEach((n) => {
+      n.dataset.i18nAttr.split(";").forEach((pair) => {
+        const [attr, key] = pair.split(":");
+        const store = "it" + attr.replace(/[^a-z]/gi, "");
+        if (n.dataset[store] === undefined) n.dataset[store] = n.getAttribute(attr) || "";
+        n.setAttribute(attr, lang === "en" && STATIC_EN[key] !== undefined ? STATIC_EN[key] : n.dataset[store]);
+      });
+    });
+    langHooks.forEach((fn) => { try { fn(lang); } catch (e) { console.error(e); } });
+  }
+
   function rng(seed) { // generatore pseudo-casuale riproducibile
     let s = seed >>> 0;
     return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
@@ -779,8 +1021,8 @@ window.addEventListener("error", function (e) {
     for (const p of pads) if (p && p.connected && p.axes && p.axes.length >= 4) return p;
     return null;
   }
-  window.addEventListener("gamepadconnected", (e) => toast && toast("Controller collegato: " + shortName(e.gamepad.id)));
-  window.addEventListener("gamepaddisconnected", () => toast && toast("Controller scollegato", "warn"));
+  window.addEventListener("gamepadconnected", (e) => toast && toast(i18n("padConnected", shortName(e.gamepad.id))));
+  window.addEventListener("gamepaddisconnected", () => toast && toast(i18n("padDisconnected"), "warn"));
   function shortName(id) { return (id || "gamepad").replace(/\(.*?\)/g, "").trim().slice(0, 40) || "gamepad"; }
 
   function readInput(dt) {
@@ -882,13 +1124,13 @@ window.addEventListener("error", function (e) {
   function angleDiff(a, b) { let d = a - b; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI; return d; }
   function say(msg, kind) { if (typeof toast === "function") toast(msg, kind); }
 
-  function startMotors() { if (flight.battery <= 10) { say("Batteria troppo scarica per decollare: premi R per cambiarla", "crit"); return; } flight.forced = false; sim.state = "idle"; flight.idleTimer = 0; say("Motori avviati: spingi il gas in su per decollare"); }
-  function stopMotors(msg) { flight.precisionLand = false; sim.state = "off"; sim.vel.set(0, 0, 0); flight.rthPhase = null; say(msg || "Motori spenti"); }
+  function startMotors() { if (flight.battery <= 10) { say(i18n("battLowTakeoff"), "crit"); return; } flight.forced = false; sim.state = "idle"; flight.idleTimer = 0; say(i18n("motorsOn")); }
+  function stopMotors(msg) { flight.precisionLand = false; sim.state = "off"; sim.vel.set(0, 0, 0); flight.rthPhase = null; say(msg || i18n("motorsOff")); }
   function crash() {
     sim.state = "crashed";
     sim.vel.x *= -0.2; sim.vel.z *= -0.2; sim.vel.y = Math.min(sim.vel.y, 0); // rimbalzo sull'ostacolo
     flight.rthPhase = null;
-    say("Collisione! Premi R o Start per ripartire", "crit");
+    say(i18n("crash"), "crit");
   }
   function resetSim() {
     sim.pos.set(0, 0, 0); sim.vel.set(0, 0, 0);
@@ -896,16 +1138,16 @@ window.addEventListener("error", function (e) {
     sim.state = "off"; sim.rotorSpeed = 0;
     flight.battery = 100; flight.flightTime = 0; flight.warned20 = false; flight.rthPhase = null;
     flight.landHold = 0; flight.idleTimer = 0; flight.forced = false;
-    say("Drone sulla piazzola, batteria al 100%");
+    say(i18n("resetDone"));
   }
   function setMode(k) {
     if (!MODES[k]) return;
     flight.mode = k;
-    say("Modalità " + MODES[k].label + " · max " + MODES[k].vmax + " m/s");
+    say(i18n("modeSet", MODES[k].label, MODES[k].vmax));
   }
   function startRTH() {
     flight.rthPhase = "climb"; sim.state = "rth";
-    say("Ritorno a casa: salgo a " + flight.rthAlt + " m e rientro. B per annullare", "warn");
+    say(i18n("rthStart", flight.rthAlt), "warn");
   }
 
   function handleActions() {
@@ -913,20 +1155,20 @@ window.addEventListener("error", function (e) {
     for (const a of input.actions) {
       const st = sim.state;
       if (a === "toggleTakeoff") {
-        if ((st === "off" || st === "idle") && flight.battery <= 10) say("Batteria troppo scarica per decollare: premi R per cambiarla", "crit");
-        else if (st === "off") { startMotors(); sim.state = "takeoff"; say("Decollo automatico"); }
-        else if (st === "idle") { sim.state = "takeoff"; say("Decollo automatico"); }
-        else if (st === "flying" || st === "takeoff" || st === "rth") { sim.state = "landing"; flight.rthPhase = null; say("Atterraggio automatico. B per annullare"); }
-        else if (st === "landing" && !flight.forced) { sim.state = "flying"; say("Atterraggio annullato"); }
+        if ((st === "off" || st === "idle") && flight.battery <= 10) say(i18n("battLowTakeoff"), "crit");
+        else if (st === "off") { startMotors(); sim.state = "takeoff"; say(i18n("autoTakeoff")); }
+        else if (st === "idle") { sim.state = "takeoff"; say(i18n("autoTakeoff")); }
+        else if (st === "flying" || st === "takeoff" || st === "rth") { sim.state = "landing"; flight.rthPhase = null; say(i18n("autoLand")); }
+        else if (st === "landing" && !flight.forced) { sim.state = "flying"; say(i18n("landCancel")); }
       } else if (a === "rth") {
-        if (st === "rth") { sim.state = "flying"; flight.rthPhase = null; say("Ritorno a casa annullato"); }
+        if (st === "rth") { sim.state = "flying"; flight.rthPhase = null; say(i18n("rthCancel")); }
         else if ((st === "flying" || st === "landing" || st === "takeoff") && sim.pos.y > 0.3) startRTH();
       } else if (a === "cancel") {
-        if (st === "landing" && flight.forced) say("Batteria critica: l'atterraggio non si può annullare", "crit");
-        else if (st === "takeoff" || st === "landing" || st === "rth") { sim.state = "flying"; flight.rthPhase = null; say("Comando annullato: hovering"); }
+        if (st === "landing" && flight.forced) say(i18n("forcedNoCancel"), "crit");
+        else if (st === "takeoff" || st === "landing" || st === "rth") { sim.state = "flying"; flight.rthPhase = null; say(i18n("cmdCancel")); }
       } else if (a === "camera") {
         view.mode = view.mode === "chase" ? "fpv" : view.mode === "fpv" ? "ground" : "chase";
-        say({ chase: "Vista: dietro al drone", fpv: "Vista: camera del drone", ground: "Vista: dal pilota (come dal vero)" }[view.mode]);
+        say({ chase: i18n("viewChase"), fpv: i18n("viewFpv"), ground: i18n("viewGround") }[view.mode]);
       } else if (a === "modeNext" || a === "modePrev") {
         const i = MODE_ORDER.indexOf(flight.mode) + (a === "modeNext" ? 1 : -1);
         setMode(MODE_ORDER[clamp(i, 0, 2)]);
@@ -1006,7 +1248,7 @@ window.addEventListener("error", function (e) {
       flight.idleTimer += dt;
       if (input.thr > 0.25) { sim.state = "flying"; }
       else if (cscEdge && flight.idleTimer > 0.5) { stopMotors(); return; }
-      else if (flight.idleTimer > 8) { stopMotors("Motori spenti: nessun decollo entro 8 secondi"); return; }
+      else if (flight.idleTimer > 8) { stopMotors(i18n("motorsOffIdle")); return; }
       else return;
     }
 
@@ -1022,7 +1264,7 @@ window.addEventListener("error", function (e) {
       tyaw = -input.yaw * m.yaw * DEG;
     } else if (sim.state === "takeoff") {
       tvy = 1.2;
-      if (sim.pos.y >= 1.2) { sim.state = "flying"; say("Hovering a 1,2 m: ora tocca a te"); }
+      if (sim.pos.y >= 1.2) { sim.state = "flying"; say(i18n("hoverReady")); }
     } else if (sim.state === "landing") {
       tvy = sim.pos.y > 2 ? -1.5 : -0.6;
       tyaw = -input.yaw * m.yaw * DEG * 0.5;
@@ -1031,9 +1273,9 @@ window.addEventListener("error", function (e) {
         tf = clamp((ex * fwd.x + ez * fwd.z) * 1.5, -2, 2);
         tr = clamp((ex * right.x + ez * right.z) * 1.5, -2, 2);
       }
-      if (input.thr > 0.5 && !flight.forced) { sim.state = "flying"; say("Atterraggio annullato"); }
+      if (input.thr > 0.5 && !flight.forced) { sim.state = "flying"; say(i18n("landCancel")); }
     } else if (sim.state === "rth") {
-      if (stickBusy) { sim.state = "flying"; flight.rthPhase = null; say("Ritorno a casa interrotto dagli stick"); }
+      if (stickBusy) { sim.state = "flying"; flight.rthPhase = null; say(i18n("rthSticks")); }
       else {
         const dx = flight.home.x - sim.pos.x, dz = flight.home.z - sim.pos.z, dist = Math.hypot(dx, dz);
         const homeYaw = Math.atan2(-dx, -dz);
@@ -1049,7 +1291,7 @@ window.addEventListener("error", function (e) {
           const d = angleDiff(homeYaw, sim.yaw);
           tyaw = clamp(d * 3, -1.5, 1.5);
           tf = Math.min(MODES.N.vmax, dist * 0.6);
-          if (dist < 0.6) { sim.state = "landing"; flight.rthPhase = null; flight.precisionLand = true; say("Sopra la piazzola: atterraggio"); }
+          if (dist < 0.6) { sim.state = "landing"; flight.rthPhase = null; flight.precisionLand = true; say(i18n("overPad")); }
         }
       }
     }
@@ -1080,24 +1322,24 @@ window.addEventListener("error", function (e) {
       sim.pos.y = 0;
       if (sim.vel.y < 0) sim.vel.y = 0;
       sim.vel.x = 0; sim.vel.z = 0;
-      if (sim.state === "landing") { stopMotors("Atterrato"); return; }
+      if (sim.state === "landing") { stopMotors(i18n("landed")); return; }
       if (sim.state === "flying" && input.thr < -0.6) {
         flight.landHold += dt;
-        if (flight.landHold > 0.8) { stopMotors("Atterrato: motori spenti"); flight.landHold = 0; return; }
+        if (flight.landHold > 0.8) { stopMotors(i18n("landedOff")); flight.landHold = 0; return; }
       } else flight.landHold = 0;
     } else flight.landHold = 0;
 
     // limiti di volo
     if (sim.pos.y > flight.maxAlt) {
       sim.pos.y = flight.maxAlt; if (sim.vel.y > 0) sim.vel.y = 0;
-      if (t - flight.limitToastAt > 3) { say("Limite di altitudine: 120 m", "warn"); flight.limitToastAt = t; }
+      if (t - flight.limitToastAt > 3) { say(i18n("altLimit"), "warn"); flight.limitToastAt = t; }
     }
     const dh = Math.hypot(sim.pos.x - flight.home.x, sim.pos.z - flight.home.z);
     if (dh > flight.maxDist) {
       const k = flight.maxDist / dh;
       sim.pos.x = flight.home.x + (sim.pos.x - flight.home.x) * k;
       sim.pos.z = flight.home.z + (sim.pos.z - flight.home.z) * k;
-      if (t - flight.limitToastAt > 3) { say("Limite dell'area di volo: " + flight.maxDist + " m", "warn"); flight.limitToastAt = t; }
+      if (t - flight.limitToastAt > 3) { say(i18n("distLimit", flight.maxDist), "warn"); flight.limitToastAt = t; }
     }
 
     collide();
@@ -1122,10 +1364,10 @@ window.addEventListener("error", function (e) {
     const drain = (100 / (28 * 60)) * (1 + 0.5 * speedFrac + 0.5 * Math.max(0, sim.vel.y) / 5 + w / 20);
     flight.battery = Math.max(0, flight.battery - drain * dt);
     if (airborne) flight.flightTime += dt;
-    if (flight.battery <= 20 && !flight.warned20) { flight.warned20 = true; say("Batteria al 20%: è ora di rientrare", "warn"); }
+    if (flight.battery <= 20 && !flight.warned20) { flight.warned20 = true; say(i18n("batt20"), "warn"); }
     if (flight.battery <= 10 && airborne && sim.state !== "landing") {
       sim.state = "landing"; flight.rthPhase = null; flight.forced = true;
-      say("Batteria critica: atterraggio automatico", "crit");
+      say(i18n("battCrit"), "crit");
     }
   }
 
@@ -1190,10 +1432,6 @@ window.addEventListener("error", function (e) {
     crosshair: $("crosshair"), toasts: $("toasts"), intro: $("intro"), settingsPanel: $("settingsPanel"),
     padStatus: $("padStatus"), padText: $("padText"),
   };
-  const STATUS = {
-    off: "Motori spenti", idle: "Motori accesi", takeoff: "Decollo", flying: "In volo",
-    landing: "Atterraggio", rth: "Ritorno a casa", crashed: "Collisione",
-  };
 
   function toast(msg, kind) {
     const t = document.createElement("div");
@@ -1209,16 +1447,39 @@ window.addEventListener("error", function (e) {
   const setHTML = (node, html) => { if (node.innerHTML !== html) node.innerHTML = html; };
   const fmt = (v, d) => (Math.abs(v) < 0.05 && d ? 0 : v).toFixed(d);
 
-  if (IS_MOBILE) {
-    const short = ["Alt. H", "Dist. D", "Vel. O", "Vel. V"];
+  // etichette brevi della telemetria sul telefono, nella lingua scelta
+  langHooks.push(() => {
+    if (!IS_MOBILE) return;
+    const short = [i18n("shortH"), i18n("shortD"), i18n("shortHS"), i18n("shortVS")];
     document.querySelectorAll(".telemetry .label").forEach((n, i) => { if (short[i]) n.textContent = short[i]; });
-  }
+  });
 
   // modalità di volo cliccabili
   ["C", "N", "S"].forEach((k) => $("mode" + k).addEventListener("click", (e) => { setMode(k); e.currentTarget.blur(); }));
 
   // finestre
   function openIntro() { el.intro.hidden = false; el.settingsPanel.hidden = true; setPadFocus(null); }
+  // schermata iniziale: scelta della lingua
+  const langPick = $("langPick");
+  const langBtns = [$("langIT"), $("langEN")];
+  // tocco e clic arrivano entrambi: si esegue una volta sola
+  const onTapOnce = (node, fn) => {
+    let lastT = -1e9;
+    const h = (e) => { if (e) e.preventDefault(); const n = performance.now(); if (n - lastT < 500) return; lastT = n; fn(); };
+    node.addEventListener("click", h); node.addEventListener("pointerup", h);
+  };
+  function chooseLang(l) {
+    applyLang(l);
+    langPick.hidden = true;
+    openIntro();
+  }
+  langBtns.forEach((b) => onTapOnce(b, () => chooseLang(b.dataset.lang)));
+  window.addEventListener("keydown", (e) => {
+    if (langPick.hidden) return;
+    if (e.code === "ArrowLeft" || e.code === "ArrowRight") { e.preventDefault(); setPadFocus(langBtns[e.code === "ArrowLeft" ? 0 : 1]); }
+    else if (e.code === "Enter" || e.code === "Space") { e.preventDefault(); chooseLang((padFocus || langBtns[lang === "en" ? 1 : 0]).dataset.lang); }
+  });
+  langHooks.push((l) => langBtns.forEach((b) => b.classList.toggle("current", b.dataset.lang === l)));
   function closeIntro() { el.intro.hidden = true; }
   function toggleSettings(fromPad) {
     const open = el.settingsPanel.hidden;
@@ -1246,6 +1507,16 @@ window.addEventListener("error", function (e) {
     }
   }
   function uiGate() {
+    if (!langPick.hidden) {
+      for (const a of input.actions) {
+        if (a === "navLeft" || a === "navUp") setPadFocus(langBtns[0]);
+        else if (a === "navRight" || a === "navDown") setPadFocus(langBtns[1]);
+        else if (a === "toggleTakeoff") { chooseLang((padFocus || langBtns[lang === "en" ? 1 : 0]).dataset.lang); break; }
+      }
+      // anche lo stick sinistro sceglie la lingua
+      if (Math.abs(input.raw.lx || 0) > 0.6) setPadFocus(langBtns[input.raw.lx < 0 ? 0 : 1]);
+      return true;
+    }
     const introOpen = !el.intro.hidden, setOpen = !el.settingsPanel.hidden;
     if (!introOpen && !setOpen) return false;
     for (const a of input.actions) {
@@ -1285,12 +1556,15 @@ window.addEventListener("error", function (e) {
     $("optDead").value = settings.deadzone; $("outDead").textContent = Math.round(settings.deadzone * 100) + "%";
     $("optExpo").value = settings.expo; $("outExpo").textContent = Math.round(settings.expo * 100) + "%";
     $("optWind").value = settings.wind;
+    $("optLang").value = lang;
   }
   $("optMode").addEventListener("change", (e) => { settings.stickMode = Number(e.target.value); saveSettings(); });
   $("optDead").addEventListener("input", (e) => { settings.deadzone = Number(e.target.value); saveSettings(); syncSettingsForm(); });
   $("optExpo").addEventListener("input", (e) => { settings.expo = Number(e.target.value); saveSettings(); syncSettingsForm(); });
   $("optWind").addEventListener("change", (e) => { settings.wind = e.target.value; saveSettings(); });
+  $("optLang").addEventListener("change", (e) => { applyLang(e.target.value); syncSettingsForm(); });
   syncSettingsForm();
+  applyLang(lang); // lingua iniziale: quella salvata, altrimenti quella del browser
 
   // radar: casa al centro, nord in alto
   const rctx = el.radar.getContext("2d");
@@ -1343,10 +1617,10 @@ window.addEventListener("error", function (e) {
     hudAcc = 0;
 
     el.status.dataset.s = sim.state;
-    setText(el.status, STATUS[sim.state] || sim.state);
+    setText(el.status, i18n("st_" + sim.state));
     ["C", "N", "S"].forEach((k) => $("mode" + k).setAttribute("aria-pressed", String(flight.mode === k)));
 
-    setText(el.windChip, settings.wind === "none" ? "Vento assente" : "Vento " + flight.windSpeed.toFixed(0) + " m/s");
+    setText(el.windChip, settings.wind === "none" ? i18n("windNone") : i18n("windVal", flight.windSpeed.toFixed(0)));
     const b = Math.ceil(flight.battery);
     el.battFill.style.width = b + "%";
     el.batt.dataset.lvl = b <= 10 ? "crit" : b <= 20 ? "warn" : "ok";
@@ -1361,22 +1635,22 @@ window.addEventListener("error", function (e) {
     setHTML(el.tVS, fmt(sim.vel.y, 1) + "<small>m/s</small>");
 
     const mode1 = settings.stickMode === 1;
-    setHTML(el.lblL, mode1 ? "Sinistro<br>avanti · rotazione" : "Sinistro<br>gas · rotazione");
-    setHTML(el.lblR, mode1 ? "Destro<br>gas · laterale" : "Destro<br>avanti · laterale");
+    setHTML(el.lblL, mode1 ? i18n("lblLm1") : i18n("lblLm2"));
+    setHTML(el.lblR, mode1 ? i18n("lblRm1") : i18n("lblRm2"));
 
     const range = drawRadar();
-    setText(el.radarScale, "Raggio " + range + " m · N in alto");
+    setText(el.radarScale, i18n("radarScale", range));
 
     const gim = Math.round(-view.gimbal / DEG);
-    setText(el.viewTag, view.mode === "fpv" ? "Camera del drone · gimbal −" + gim + "°" :
-      view.mode === "ground" ? "Vista dal pilota" : "Vista dietro al drone");
+    setText(el.viewTag, view.mode === "fpv" ? i18n("tagFpv", gim) :
+      view.mode === "ground" ? i18n("tagGround") : i18n("tagChase"));
     el.crosshair.hidden = view.mode !== "fpv";
 
     if (!el.intro.hidden) {
       el.padStatus.dataset.on = input.source === "gamepad" ? "1" : "0";
-      setText(el.padText, input.source === "gamepad" ? "Controller pronto: " + input.padName + " · premi A per iniziare"
-        : IS_MOBILE ? "Comandi touch pronti · funziona anche un controller Bluetooth"
-        : "Nessun controller: muovi uno stick o premi un tasto per collegarlo");
+      setText(el.padText, input.source === "gamepad" ? i18n("padReady", input.padName)
+        : IS_MOBILE ? i18n("touchReady")
+        : i18n("noPad"));
       if (IS_MOBILE && input.source !== "gamepad") el.padStatus.dataset.on = "1";
     }
 
@@ -1468,15 +1742,14 @@ window.addEventListener("error", function (e) {
     holdButton("tbGimDown", -1);
     $("btnStart").addEventListener("click", enterFullscreen);
   }
-  const TAKE_LABEL = { off: "Decolla", idle: "Decolla", takeoff: "Atterra", flying: "Atterra", landing: "Annulla", rth: "Atterra", crashed: "Decolla" };
   function updateTouchUI() {
     if (!IS_MOBILE) return;
-    setText($("tbTake"), TAKE_LABEL[sim.state] || "Decolla");
+    setText($("tbTake"), i18n("take_" + sim.state));
     $("tbReset").hidden = sim.state !== "crashed" && flight.battery > 10;
     $("tgimbal").hidden = view.mode !== "fpv";
     const mode1 = settings.stickMode === 1;
-    setText($("tlabelL"), mode1 ? "Avanti · rotazione" : "Gas · rotazione");
-    setText($("tlabelR"), mode1 ? "Gas · laterale" : "Avanti · laterale");
+    setText($("tlabelL"), mode1 ? i18n("tlM1L") : i18n("tlM2L"));
+    setText($("tlabelR"), mode1 ? i18n("tlM1R") : i18n("tlM2R"));
   }
 
   // ---------- Ciclo principale ----------
@@ -1489,7 +1762,7 @@ window.addEventListener("error", function (e) {
     try { tick(now); } catch (err) {
       frameErrors++;
       if (frameErrors <= 3) console.error(err);
-      if (frameErrors === 1 && typeof showError === "function") showError("Errore: " + (err && err.message ? err.message : err));
+      if (frameErrors === 1 && typeof showError === "function") showError(i18n("error") + ": " + (err && err.message ? err.message : err));
     }
   }
   function tick(now) {
